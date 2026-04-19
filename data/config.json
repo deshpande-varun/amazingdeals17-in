@@ -1,0 +1,40 @@
+{
+  "siteConfig": {
+    "siteName": "Amazing Deals India",
+    "siteUrl": "amazingdeals17-in.vercel.app",
+    "instagram": "@amazingdeals_17_in",
+    "description": "Daily Amazon India deals under ₹5000 - Save 50-70% every day!"
+  },
+  "amazonConfig": {
+    "affiliateTag": "PLACEHOLDER-21",
+    "domain": "amazon.in",
+    "priceRange": {
+      "min": 0,
+      "max": 5000
+    },
+    "currency": "₹",
+    "categories": ["all"],
+    "dealsPerDay": 50
+  },
+  "scrapeConfig": {
+    "schedule": "0 4 * * *",
+    "scheduleReadable": "Daily at 9:30 AM IST",
+    "autoRun": true,
+    "timezone": "Asia/Kolkata"
+  },
+  "instagramConfig": {
+    "captionTemplate": "🔥 {productName} - {discount}% OFF!\n\n💰 Was ₹{originalPrice}, Now ₹{currentPrice}\n\n🚨 Comment \"LINK\" & I'll send you the direct Amazon link\n\nFollow @amazingdeals_17_in for daily Amazon India deals you don't want to miss! 👇\n\n#amazonindia #amazondealsindia #dailydeals #amazonfinds #dealoftheday #discounts #savingmoney #amazonin #dealfinder #indiandeals",
+    "hashtags": [
+      "amazonindia",
+      "amazondealsindia",
+      "dailydeals",
+      "amazonfinds",
+      "dealoftheday",
+      "discounts",
+      "savingmoney",
+      "amazonin",
+      "dealfinder",
+      "indiandeals"
+    ]
+  }
+}
