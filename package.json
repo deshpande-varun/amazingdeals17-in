@@ -5,5 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "scrape": "node scripts/scrape-deals.js"
+  },
+  "dependencies": {
+    "amazon-paapi": "^1.1.0"
   }
 }
