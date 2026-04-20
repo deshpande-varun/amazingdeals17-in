@@ -19,7 +19,6 @@ function rainforestRequest(endpoint, params) {
 
     const queryParams = new URLSearchParams({
       api_key: API_KEY,
-      amazon_domain: 'amazon.in',
       ...params
     });
 
@@ -66,8 +65,7 @@ async function scrapeAmazonIndia() {
 
         const response = await rainforestRequest('bestsellers', {
           type: 'bestsellers',
-          url: `https://www.amazon.in/gp/bestsellers/${category}/`,
-          category_id: category
+          url: `https://www.amazon.in/gp/bestsellers/${category}/`
         });
 
         if (response.bestsellers) {
