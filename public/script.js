@@ -136,17 +136,26 @@ function createDealCard(deal) {
     card.className = 'deal-card';
     card.onclick = () => window.open(deal.url, '_blank');
 
+    // Create image element with fallback
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'deal-image-container';
+
     const img = document.createElement('img');
     img.src = deal.imageUrl;
     img.alt = deal.name;
     img.className = 'deal-image';
     img.loading = 'lazy';
-    img.setAttribute('data-category', deal.category || 'Product');
+
     // Fallback if image fails to load
     img.onerror = function() {
-        this.classList.add('error');
-        this.removeAttribute('src');
+        // Replace with styled div
+        const placeholder = document.createElement('div');
+        placeholder.className = 'deal-image-placeholder';
+        placeholder.innerHTML = `<span>📦 ${deal.category || 'Product'}</span>`;
+        imgContainer.replaceChild(placeholder, img);
     };
+
+    imgContainer.appendChild(img);
 
     const content = document.createElement('div');
     content.className = 'deal-content';
@@ -211,7 +220,7 @@ function createDealCard(deal) {
     content.appendChild(priceDiv);
     content.appendChild(shopBtn);
 
-    card.appendChild(img);
+    card.appendChild(imgContainer);
     card.appendChild(content);
 
     return card;
