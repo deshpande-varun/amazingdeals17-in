@@ -141,6 +141,10 @@ function createDealCard(deal) {
     img.alt = deal.name;
     img.className = 'deal-image';
     img.loading = 'lazy';
+    // Fallback if image fails to load
+    img.onerror = function() {
+        this.src = `https://via.placeholder.com/300x300/26758d/ffffff?text=${encodeURIComponent(deal.category || 'Deal')}`;
+    };
 
     const content = document.createElement('div');
     content.className = 'deal-content';
