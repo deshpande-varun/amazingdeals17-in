@@ -136,26 +136,15 @@ function createDealCard(deal) {
     card.className = 'deal-card';
     card.onclick = () => window.open(deal.url, '_blank');
 
-    // Create image element with fallback
+    // Create placeholder (Amazon images won't load due to hotlink protection)
     const imgContainer = document.createElement('div');
     imgContainer.className = 'deal-image-container';
 
-    const img = document.createElement('img');
-    img.src = deal.imageUrl;
-    img.alt = deal.name;
-    img.className = 'deal-image';
-    img.loading = 'lazy';
+    const placeholder = document.createElement('div');
+    placeholder.className = 'deal-image-placeholder';
+    placeholder.innerHTML = `<span>📦 ${deal.category || 'Product'}</span>`;
 
-    // Fallback if image fails to load
-    img.onerror = function() {
-        // Replace with styled div
-        const placeholder = document.createElement('div');
-        placeholder.className = 'deal-image-placeholder';
-        placeholder.innerHTML = `<span>📦 ${deal.category || 'Product'}</span>`;
-        imgContainer.replaceChild(placeholder, img);
-    };
-
-    imgContainer.appendChild(img);
+    imgContainer.appendChild(placeholder);
 
     const content = document.createElement('div');
     content.className = 'deal-content';
