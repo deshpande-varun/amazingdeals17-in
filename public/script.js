@@ -141,9 +141,11 @@ function createDealCard(deal) {
     img.alt = deal.name;
     img.className = 'deal-image';
     img.loading = 'lazy';
+    img.setAttribute('data-category', deal.category || 'Product');
     // Fallback if image fails to load
     img.onerror = function() {
-        this.src = `https://via.placeholder.com/300x300/26758d/ffffff?text=${encodeURIComponent(deal.category || 'Deal')}`;
+        this.classList.add('error');
+        this.removeAttribute('src');
     };
 
     const content = document.createElement('div');
