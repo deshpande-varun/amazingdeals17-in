@@ -93,7 +93,7 @@ function parseDealsPage(html, sourceLabel, maxPrice) {
     const text = stripTags(chunk);
 
     const price = parseINRPrice(text);
-    if (!price || price <= 0 || price > maxPrice) continue;
+    if (!price || price < 50 || price > maxPrice) continue;
 
     const titleMatch = chunk.match(/alt="([^"]{10,200})"/) ||
                        chunk.match(/"title":\s*"([^"]{10,200})"/);
@@ -103,9 +103,8 @@ function parseDealsPage(html, sourceLabel, maxPrice) {
 
     const imgMatch = chunk.match(/src="(https:\/\/images-eu\.ssl-images-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/) ||
                     chunk.match(/src="(https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/);
-    const imageUrl = imgMatch
-      ? imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg')
-      : null;
+    if (!imgMatch) continue;
+    const imageUrl = imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg');
 
     const couponCode = parseCouponCode(text);
     const couponInfo = parseCouponInfo(text);

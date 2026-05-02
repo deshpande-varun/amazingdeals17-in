@@ -84,12 +84,10 @@ function parseCategory(html, categoryName, maxItems, maxPrice) {
     const title = titleMatch[1].trim();
     if (title.length < 10) continue;
 
-    // Images on Amazon India use images-eu.ssl-images-amazon.com
-    const imgMatch = chunk.match(/src="(https:\/\/images-eu\.ssl-images-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/);
-    // Strip sizing suffix and request a clean 400px version
-    const imageUrl = imgMatch
-      ? imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg')
-      : null;
+    const imgMatch = chunk.match(/src="(https:\/\/images-eu\.ssl-images-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/) ||
+                     chunk.match(/src="(https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/);
+    if (!imgMatch) continue;
+    const imageUrl = imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg');
 
     const ratingMatch = text.match(/([0-9]\.[0-9]) out of 5/);
     const rating = ratingMatch ? parseFloat(ratingMatch[1]) : null;
