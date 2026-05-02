@@ -101,8 +101,11 @@ function parseDealsPage(html, sourceLabel, maxPrice) {
     const title = titleMatch[1].trim();
     if (title.length < 10) continue;
 
-    const imgMatch = chunk.match(/src="(https:\/\/images[^"]+\.(?:jpg|png)[^"]*)"/);
-    const imageUrl = imgMatch ? imgMatch[1] : null;
+    const imgMatch = chunk.match(/src="(https:\/\/images-eu\.ssl-images-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/) ||
+                    chunk.match(/src="(https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/);
+    const imageUrl = imgMatch
+      ? imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg')
+      : null;
 
     const couponCode = parseCouponCode(text);
     const couponInfo = parseCouponInfo(text);

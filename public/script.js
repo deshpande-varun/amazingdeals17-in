@@ -146,21 +146,23 @@ function createDealCard(deal) {
         img.src = deal.imageUrl;
         img.alt = deal.name;
 
-        // Fallback to placeholder if image fails
         img.onerror = () => {
             img.remove();
             const placeholder = document.createElement('div');
             placeholder.className = 'deal-image-placeholder';
-            placeholder.innerHTML = `<span>📦 ${deal.category || 'Product'}</span>`;
+            const span = document.createElement('span');
+            span.textContent = '📦 ' + (deal.category || 'Product');
+            placeholder.appendChild(span);
             imgContainer.appendChild(placeholder);
         };
 
         imgContainer.appendChild(img);
     } else {
-        // No image URL, show placeholder
         const placeholder = document.createElement('div');
         placeholder.className = 'deal-image-placeholder';
-        placeholder.innerHTML = `<span>📦 ${deal.category || 'Product'}</span>`;
+        const span = document.createElement('span');
+        span.textContent = '📦 ' + (deal.category || 'Product');
+        placeholder.appendChild(span);
         imgContainer.appendChild(placeholder);
     }
 

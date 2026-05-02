@@ -54,7 +54,8 @@ function parseCategory(html, categoryName, maxItems, maxPrice) {
   const deals = [];
   const seenAsins = new Set();
 
-  const asinMatches = [...html.matchAll(/\/dp\/([A-Z0-9]{10})/g)];
+  // Amazon India uses data-asin="ASIN" as the anchor for each product card
+  const asinMatches = [...html.matchAll(/data-asin="([A-Z0-9]{10})"/g)];
   const orderedAsins = [];
   for (const m of asinMatches) {
     if (!seenAsins.has(m[1])) {
@@ -66,26 +67,29 @@ function parseCategory(html, categoryName, maxItems, maxPrice) {
   for (const { asin, index } of orderedAsins) {
     if (deals.length >= maxItems) break;
 
-    const start = Math.max(0, index - 1500);
-    const end = Math.min(html.length, index + 1500);
-    const chunk = html.slice(start, end);
+    // Look forward from data-asin attribute — the card content follows it
+    const end = Math.min(html.length, index + 3000);
+    const chunk = html.slice(index, end);
     const text = stripTags(chunk);
 
-    // Price in Indian Rupees — ₹ or Rs. patterns
-    const priceMatch = text.match(/₹\s*([0-9,]+)/) || text.match(/Rs\.?\s*([0-9,]+)/);
+    // Price in Indian Rupees
+    const priceMatch = text.match(/₹\s*([0-9,]+)/) || text.match(/Rs\.?\s*([0-9,]+)/i);
     if (!priceMatch) continue;
     const price = parseInt(priceMatch[1].replace(/,/g, ''), 10);
     if (price <= 0 || price > maxPrice) continue;
 
+    // Title from alt attribute (product image alt text)
     const titleMatch = chunk.match(/alt="([^"]{10,200})"/);
     if (!titleMatch) continue;
     const title = titleMatch[1].trim();
     if (title.length < 10) continue;
 
-    const imgMatch = chunk.match(/src="(https:\/\/images[^"]+\.(?:jpg|png)[^"]*)"/);
+    // Images on Amazon India use images-eu.ssl-images-amazon.com
+    const imgMatch = chunk.match(/src="(https:\/\/images-eu\.ssl-images-amazon\.com\/images\/I\/[A-Za-z0-9%.,_-]+\.jpg)[^"]*"/);
+    // Strip sizing suffix and request a clean 400px version
     const imageUrl = imgMatch
-      ? imgMatch[1]
-      : 'https://images-na.ssl-images-amazon.com/images/P/' + asin + '.01._SCLZZZZZZZ_.jpg';
+      ? imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg')
+      : null;
 
     const ratingMatch = text.match(/([0-9]\.[0-9]) out of 5/);
     const rating = ratingMatch ? parseFloat(ratingMatch[1]) : null;
@@ -93,7 +97,11 @@ function parseCategory(html, categoryName, maxItems, maxPrice) {
     const reviewMatch = text.match(/([0-9,]+)\s*(?:ratings?|reviews?)/i);
     const reviewCount = reviewMatch ? parseInt(reviewMatch[1].replace(/,/g, ''), 10) : null;
 
-    const originalPrice = Math.round(price * (1.25 + Math.random() * 0.15));
+    // MRP from "M.R.P.: ₹X" pattern common on Amazon India
+    const mrpMatch = text.match(/M\.R\.P\.?\s*:?\s*₹\s*([0-9,]+)/i);
+    const originalPrice = mrpMatch
+      ? parseInt(mrpMatch[1].replace(/,/g, ''), 10)
+      : Math.round(price * (1.25 + Math.random() * 0.15));
 
     deals.push({
       id: asin,
@@ -102,7 +110,7 @@ function parseCategory(html, categoryName, maxItems, maxPrice) {
       url: 'https://www.amazon.in/dp/' + asin,
       originalUrl: 'https://www.amazon.in/dp/' + asin,
       price,
-      originalPrice,
+      originalPrice: originalPrice > price ? originalPrice : Math.round(price * 1.3),
       currency: '₹',
       imageUrl,
       category: categoryName,
