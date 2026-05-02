@@ -86,11 +86,35 @@ async function scrapeAmazonIndia() {
 
     console.log(`\n📦 Total products scraped: ${allProducts.length}`);
 
-    // Format deals
+    // Load existing deals to avoid duplicates
+    const dealsFile = path.join(__dirname, '../data/deals.json');
+    let existingDeals = [];
+    try {
+      if (fs.existsSync(dealsFile)) {
+        existingDeals = JSON.parse(fs.readFileSync(dealsFile, 'utf8'));
+      }
+    } catch (error) {
+      console.log('No existing deals file found, starting fresh');
+    }
+
+    // Get ASINs shown in last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentAsins = new Set(
+      existingDeals
+        .filter(deal => new Date(deal.scrapedAt) > sevenDaysAgo)
+        .map(deal => deal.asin)
+    );
+
+    console.log(`🔍 Filtering out ${recentAsins.size} products shown in last 7 days`);
+
+    // Format deals and filter duplicates
     const deals = allProducts
       .filter(item => {
         const price = item.price?.value || 0;
-        return price > 0 && price <= config.amazonConfig.priceRange.max;
+        const isValidPrice = price > 0 && price <= config.amazonConfig.priceRange.max;
+        const isNotRecent = !recentAsins.has(item.asin);
+        return isValidPrice && isNotRecent;
       })
       .slice(0, config.amazonConfig.dealsPerDay)
       .map(item => {
