@@ -2,9 +2,8 @@ name: Daily Deals Scraper
 
 on:
   schedule:
-    # Runs every day at 9 AM UTC (adjust timezone as needed)
-    - cron: '0 9 * * *'
-  workflow_dispatch: # Allows manual trigger
+    - cron: '30 4 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -20,14 +19,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install
 
       - name: Run scraper
-        env:
-          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: npm run scrape
 
       - name: Get current date
@@ -42,3 +39,10 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add data/deals.json
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update deals - ${COMMIT_DATE}" && git push)
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx vercel --prod --token "$VERCEL_TOKEN" --yes

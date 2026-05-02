@@ -214,6 +214,30 @@ function createDealCard(deal) {
         priceDiv.appendChild(badge);
     }
 
+    // Coupon badge
+    if (deal.couponCode) {
+      const couponDiv = document.createElement('div');
+      couponDiv.className = 'coupon-badge coupon-code';
+      couponDiv.textContent = '🏷️ Use code ';
+      const strong = document.createElement('strong');
+      strong.textContent = deal.couponCode;
+      couponDiv.appendChild(strong);
+      couponDiv.appendChild(document.createTextNode(' at checkout'));
+      content.appendChild(couponDiv);
+    } else if (deal.couponType === 'clip') {
+      const couponDiv = document.createElement('div');
+      couponDiv.className = 'coupon-badge coupon-clip';
+      const pctText = deal.couponPercent ? ' (' + deal.couponPercent + '% off)' : '';
+      const amtText = deal.couponAmount ? ' (₹' + deal.couponAmount + ' off)' : '';
+      couponDiv.textContent = '✂️ Clip coupon on Amazon page' + pctText + amtText;
+      content.appendChild(couponDiv);
+    } else if (deal.couponType === 'bank_offer') {
+      const couponDiv = document.createElement('div');
+      couponDiv.className = 'coupon-badge coupon-bank';
+      couponDiv.textContent = '🏦 Bank/card offer available';
+      content.appendChild(couponDiv);
+    }
+
     const shopBtn = document.createElement('a');
     shopBtn.href = deal.url;
     shopBtn.className = 'shop-btn';
