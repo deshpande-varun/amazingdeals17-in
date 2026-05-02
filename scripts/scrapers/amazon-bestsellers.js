@@ -89,11 +89,13 @@ function parseCategory(html, categoryName, maxItems, maxPrice) {
     if (!imgMatch) continue;
     const imageUrl = imgMatch[1].replace(/\._[A-Z_0-9,]+_\.jpg$/i, '._AC_SL400_.jpg');
 
-    const ratingMatch = text.match(/([0-9]\.[0-9]) out of 5/);
-    const rating = ratingMatch ? parseFloat(ratingMatch[1]) : null;
+    // Rating and review count live in aria-label="4.1 out of 5 stars, 8,345 ratings"
+    const ariaMatch = chunk.match(/aria-label="([0-9.]+) out of 5 stars,\s*([0-9,]+)\s*ratings?"/i);
+    const rating = ariaMatch ? parseFloat(ariaMatch[1]) : null;
+    const reviewCount = ariaMatch ? parseInt(ariaMatch[2].replace(/,/g, ''), 10) : null;
 
-    const reviewMatch = text.match(/([0-9,]+)\s*(?:ratings?|reviews?)/i);
-    const reviewCount = reviewMatch ? parseInt(reviewMatch[1].replace(/,/g, ''), 10) : null;
+    // Skip products with few ratings — low-review products go out of stock frequently
+    if (!reviewCount || reviewCount < 100) continue;
 
     // MRP from "M.R.P.: ₹X" pattern common on Amazon India
     const mrpMatch = text.match(/M\.R\.P\.?\s*:?\s*₹\s*([0-9,]+)/i);
